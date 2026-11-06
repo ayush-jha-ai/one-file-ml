@@ -48,7 +48,7 @@ which follows from $\bar{y} = \tfrac1m\sum_i y_i$. Cumulative sums of $y$ and $y
 | regression score: total squared error over $m$ | `(sse_left + sse_right) / n` | [35](model.py#L35) |
 | left class counts for every cut (cumulative one-hot) | `np.cumsum(np.eye(n_classes)[ys], axis=0)` | [37](model.py#L37) |
 | right counts = total − left | `left[-1] - left` | [38](model.py#L38) |
-| $\frac{m_L}{m}I_L + \frac{m_R}{m}I_R$ | `(n_left * impurity(left) + (n - n_left) * impurity(right)) / n` | [40](model.py#L40) |
+| $\frac{m_L}{m}I_L + \frac{m_R}{m}I_R$ | `(n_left * impurity(left, criterion)` and `(n - n_left) * impurity(right, criterion)) / n` | [40-41](model.py#L40-L41) |
 | cut only between distinct values, with enough points each side | `(x[:-1] < x[1:]) & ...` | [43](model.py#L43) |
 | threshold at the midpoint | `(x[i] + x[i + 1]) / 2` | [48](model.py#L48) |
 | regression node impurity $V$ | `np.var(y)` | [78](model.py#L78) |

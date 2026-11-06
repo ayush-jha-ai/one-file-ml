@@ -54,7 +54,7 @@ That is an eigendecomposition: the principal components are the columns of $V$ (
 | components = top $k$ rows of $V^\top$ | `fix_signs(Vt[:k])` | [31](model.py#L31) |
 | $\lambda_j = s_j^2/(n-1)$ | `S**2 / (n - 1)` | [32](model.py#L32) |
 | $\lambda_j/\sum_l\lambda_l$ | `variances[:k] / variances.sum()` | [34](model.py#L34) |
-| $\mathbf{z} = V_k^\top(\mathbf{x} - \bar{\mathbf{x}})$ | `(X - self.mean_) @ self.components_.T` | [39](model.py#L39) |
+| $\mathbf{z} = V_k^\top(\mathbf{x} - \bar{\mathbf{x}})$ | `(np.asarray(X, dtype=float) - self.mean_) @ self.components_.T` | [39](model.py#L39) |
 | $\hat{\mathbf{x}} = \bar{\mathbf{x}} + V_k\mathbf{z}$ | `Z @ self.components_ + self.mean_` | [43](model.py#L43) |
 | $C = X_c^\top X_c/(n-1)$, then eigenvectors | `Xc.T @ Xc / (len(X) - 1)`, `np.linalg.eigh(C)` | [55-56](model.py#L55-L56) |
 | variance along $\mathbf{u}$: $\frac{1}{n-1}\sum_i z_i^2 = \mathbf{u}^\top C\mathbf{u}$ | `z @ z / (len(X) - 1)` | [66](model.py#L66) |

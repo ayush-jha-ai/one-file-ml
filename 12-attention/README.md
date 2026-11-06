@@ -60,7 +60,7 @@ $$PE_{t,2i} = \sin\!\big(t/10000^{2i/d}\big), \qquad PE_{t,2i+1} = \cos\!\big(t/
 | GELU (tanh form) | `0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * x**3)))` | [45](model.py#L45) |
 | $1/10000^{2i/d}$, then sin and cos | `1 / 10000 ** (np.arange(0, d, 2) / d)` | [51-53](model.py#L51-L53) |
 | split $d$ into $h$ heads of $d/h$ | `z.reshape(B, T, n_heads, d_head).transpose(0, 2, 1, 3)` | [79](model.py#L79) |
-| $Q = XW_q + \mathbf{b}_q$ (and $K$, $V$) | `x @ p["W" + c] + p["b" + c] for c in "qkv"` | [81](model.py#L81) |
+| $Q = XW_q + \mathbf{b}_q$ (and $K$, $V$) | `split(x @ p["W" + c] + p["b" + c]) for c in "qkv"` | [81](model.py#L81) |
 | concatenate heads, then $W_o$ | `heads.transpose(0, 2, 1, 3).reshape(B, T, d)`, `concat @ p["Wo"] + p["bo"]` | [83-84](model.py#L83-L84) |
 | $X \leftarrow X + \operatorname{MultiHead}(\operatorname{LN}_1(X))$ | `x = x + attn_out` | [92](model.py#L92) |
 | $X \leftarrow X + \operatorname{GELU}(\operatorname{LN}_2(X)W_1 + \mathbf{b}_1)W_2 + \mathbf{b}_2$ | `gelu(layer_norm(x, ...) @ p["W1"] + p["b1"])`, `x + h @ p["W2"] + p["b2"]` | [93-94](model.py#L93-L94) |

@@ -49,7 +49,7 @@ Each extra parameter adds $\sigma^2/n$ of variance, however useless the paramete
 | Equation | Code | Lines |
 |---|---|---|
 | $y = f(x) + \varepsilon$, $\varepsilon \sim N(0, \sigma^2)$ | `true_function(x) + rng.normal(0, noise, len(x))` | [21](model.py#L21) |
-| polynomial features (Legendre basis, same span as $1, x, \dots, x^p$) | `np.polynomial.legendre.legvander(2 * x - 1, degree)` | [27](model.py#L27) |
+| polynomial features (Legendre basis, same span as $1, x, \dots, x^p$) | `np.polynomial.legendre.legvander(2 * np.asarray(x) - 1, degree)` | [27](model.py#L27) |
 | least squares; minimum-norm solution when $p > n$ | `np.linalg.lstsq(Phi, y, rcond=None)` | [38](model.py#L38) |
 | ridge: $(\tfrac1n\Phi^\top\Phi + \alpha I)\mathbf{c} = \tfrac1n\Phi^\top\mathbf{y}$ | `np.linalg.solve(Phi.T @ Phi / n + alpha * np.eye(p), Phi.T @ y / n)` | [40](model.py#L40) |
 | $\bar{f}(x) = \mathbb{E}_D[\hat{f}_D(x)]$, estimated by simulation | `preds.mean(axis=0)` | [60](model.py#L60) |
