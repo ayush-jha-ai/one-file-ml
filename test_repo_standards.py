@@ -82,10 +82,13 @@ def test_walkthrough_links_point_at_the_quoted_code(folder):
         assert any(f in target for f in fragments), f"{folder.name}: {row[:90]}"
 
 
-@pytest.mark.parametrize("path", sorted(ROOT.glob("**/*.md")), ids=lambda p: str(p.name))
+# Only the repo's own Markdown: a recursive glob would also walk .venv (slow and irrelevant).
+MARKDOWN = sorted([*ROOT.glob("*.md"), *(p for c in CONCEPTS for p in c.glob("*.md")),
+                   *ROOT.glob("translations/**/*.md")])
+
+
+@pytest.mark.parametrize("path", MARKDOWN, ids=lambda p: str(p.relative_to(ROOT)))
 def test_writing_style(path):
-    if ".venv" in path.parts or ".pytest_cache" in path.parts:
-        return
     text = path.read_text().lower()
     if path.name != "CONTRIBUTING.md":               # it lists the banned words
         for word in BANNED:

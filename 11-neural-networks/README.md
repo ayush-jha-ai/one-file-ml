@@ -99,11 +99,11 @@ The tests check five things:
 
 Run these from inside this folder. They use moons (`make_moons(400, noise=0.15, random_state=0)`) unless stated.
 
-**1. Identical starting weights stay identical.** If two hidden units start with the same weights, they compute the same output and receive the same gradient, so every update keeps them equal. Sixteen such units behave like one. Here 16 identical units reach 88.75% accuracy, exactly what a network with a single hidden unit gets, while random starting weights reach 98.5%.
+**1. Identical starting weights stay identical.** If two hidden units start with the same weights, they compute the same output and receive the same gradient, so every update keeps them equal. Sixteen such units are one unit in disguise: after 2,000 steps, merging them into a single unit (summing their outgoing weights) gives the same outputs to `1e-10`. They reach 88.75% accuracy; the same network with random starting weights reaches 98.5%.
 
 ```python
 import numpy as np
-from model import init_params, predict, train
+from model import forward, init_params, predict, train
 from sklearn.datasets import make_moons
 
 X, y = make_moons(400, noise=0.15, random_state=0)
@@ -111,12 +111,14 @@ rng = np.random.default_rng(0)
 w, v = rng.normal(size=(2, 1)), rng.normal(size=(1, 2))
 same = [[np.repeat(w, 16, axis=1), np.zeros(16)], [np.repeat(v, 16, axis=0), np.zeros(2)]]
 same, _ = train(same, X, y, lr=0.5, steps=2000)
-one, _ = train(init_params([2, 1, 2], np.random.default_rng(0)), X, y, lr=0.5, steps=2000)
+merged = [[same[0][0][:, :1], same[0][1][:1]], [same[1][0].sum(axis=0, keepdims=True), same[1][1]]]
 rand, _ = train(init_params([2, 16, 2], np.random.default_rng(0)), X, y, lr=0.5, steps=2000)
-distinct_units = np.unique(same[0][0].round(10), axis=1).shape[1]
-accs = [np.mean(predict(p, X) == y) for p in (same, one, rand)]
-print(distinct_units, accs)                     # 1 [0.8875, 0.8875, 0.985]
-assert distinct_units == 1 and accs[0] == accs[1] < accs[2]
+
+spread = np.ptp(same[0][0], axis=1).max()                       # how different the 16 units are
+gap = np.abs(forward(same, X)[0][-1] - forward(merged, X)[0][-1]).max()
+accs = [np.mean(predict(p, X) == y) for p in (same, rand)]
+print(spread, gap, accs)                                        # 0.0  ~1e-16  [0.8875, 0.985]
+assert spread < 1e-10 and gap < 1e-10 and accs[0] < 0.92 < accs[1]
 ```
 
 **2. In a deep network the starting scale decides everything.** With 20 tanh layers of 32 units and Glorot weights, the first layer's gradient has norm 0.16. Halve every starting weight and each layer shrinks the signal further, both forwards and backwards. The gradient norm drops to $3.6\times10^{-7}$, and after 300 steps the loss has not moved from $\log 2 = 0.693$, the value for a coin toss.

@@ -5,11 +5,18 @@ we put that module's folder first on sys.path and forget any previously imported
 `model`, so each test file sees its own implementation.
 """
 
+import os
 import re
 import sys
 from pathlib import Path
 
-import pytest
+# The matrices here are tiny, so multi-threaded BLAS (alongside PyTorch's own thread pool)
+# spends more time coordinating threads than computing. Set before NumPy is imported.
+for _var in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+             "VECLIB_MAXIMUM_THREADS"):
+    os.environ.setdefault(_var, "1")
+
+import pytest  # noqa: E402
 
 
 def _use_folder(folder: Path) -> None:
