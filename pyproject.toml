@@ -1,0 +1,15 @@
+[tool.pytest.ini_options]
+# importlib mode lets every concept folder have its own model.py and test_model.py.
+addopts = "--import-mode=importlib -q"
+testpaths = ["."]
+norecursedirs = [".venv", ".git", "__pycache__"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# Maths notation: single capital letters (X, W) are clearer than snake_case here.
+ignore = ["E741", "N806"]

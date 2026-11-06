@@ -1,0 +1,8 @@
+# Python 3.11. model.py files use NumPy only; the rest is for tests and animations.
+numpy==1.26.4
+scikit-learn==1.5.2
+torch==2.5.1
+matplotlib==3.9.2
+pillow==11.0.0
+pytest==8.3.3
+ruff==0.7.4
